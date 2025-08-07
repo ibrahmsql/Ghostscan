@@ -1,0 +1,124 @@
+# GhostScan Enumeration Configuration
+# Enumeration and discovery settings
+
+enumeration:
+  # User enumeration
+  users:
+    enabled: true
+    max_users: 100
+    timeout: 15s
+    methods:
+      - "api"          # Through Ghost API
+      - "rss"          # RSS feed analysis
+      - "sitemap"      # Sitemap check
+      - "authors"      # Author pages
+      - "login_error"  # Login error messages
+    
+    # User ID range
+    id_range:
+      start: 1
+      end: 100
+      
+    # Common usernames
+    common_usernames:
+      - "admin"
+      - "administrator"
+      - "ghost"
+      - "user"
+      - "test"
+      - "demo"
+      - "editor"
+      - "author"
+      
+  # Theme enumeration
+  themes:
+    enabled: true
+    timeout: 10s
+    check_vulnerabilities: true
+    methods:
+      - "css_files"     # CSS file analysis
+      - "js_files"      # JavaScript file analysis
+      - "template_files" # Template file check
+      - "api"           # Ghost API
+      - "directory"     # Directory scanning
+      
+    # Common theme names
+    common_themes:
+      - "casper"
+      - "dawn"
+      - "editorial"
+      - "london"
+      - "massively"
+      - "phantom"
+      - "story"
+      - "alto"
+      - "ease"
+      - "journal"
+      
+  # Plugin/Integration enumeration
+  plugins:
+    enabled: true
+    timeout: 10s
+    check_vulnerabilities: true
+    methods:
+      - "api"           # Ghost API
+      - "js_files"      # JavaScript analysis
+      - "html_analysis" # HTML content analysis
+      
+  # Endpoint discovery
+  endpoints:
+    enabled: true
+    timeout: 5s
+    wordlist: "wordlists/endpoints.txt"
+    methods:
+      - "GET"
+      - "POST"
+      - "HEAD"
+      
+    # Common Ghost endpoints
+    common_paths:
+      - "/ghost/"
+      - "/ghost/api/"
+      - "/ghost/api/v4/"
+      - "/content/"
+      - "/assets/"
+      - "/public/"
+      - "/admin/"
+      - "/api/"
+      
+  # File discovery
+  files:
+    enabled: true
+    timeout: 5s
+    extensions:
+      - ".json"
+      - ".xml"
+      - ".txt"
+      - ".log"
+      - ".bak"
+      - ".old"
+      - ".backup"
+      
+    # Hassas dosyalar
+    sensitive_files:
+      - "config.json"
+      - "config.production.json"
+      - "config.development.json"
+      - ".env"
+      - "package.json"
+      - "ghost.log"
+      - "error.log"
+      
+  # Performance settings
+  performance:
+    concurrent_requests: 5
+    delay_between_requests: 100ms
+    random_delay: true
+    max_delay: 500ms
+    
+  # Output settings
+  output:
+    show_progress: true
+    verbose: false
+    save_results: true
+    format: "json"

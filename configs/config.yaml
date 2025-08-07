@@ -1,0 +1,479 @@
+# GhostScan Ana Yapılandırma Dosyası
+# Ghost CMS güvenlik tarayıcısı için temel ayarlar
+
+# Genel Ayarlar
+general:
+  # HTTP istekleri için varsayılan zaman aşımı (saniye)
+  timeout: 30
+  
+  # Maksimum eşzamanlı istek sayısı
+  max_concurrent: 10
+  
+  # İstekler için kullanılacak user agent
+  user_agent: "Mozilla/5.0 (compatible; GhostScan/1.0; Security Scanner)"
+  
+  # Detaylı çıktı modu
+  verbose: false
+  
+  # Hata ayıklama modu
+  debug: false
+  
+  # Raporlar için çıktı dizini
+  output_dir: "./reports"
+  
+  # Varsayılan çıktı formatı (json, xml, csv, html, txt, md)
+  output_format: "json"
+
+# Tarama Ayarları
+scanning:
+  # Ghost CMS tespiti
+  detect_ghost: true
+  
+  # Sürüm tespiti
+  detect_version: true
+  
+  # Tema tespiti
+  detect_theme: true
+  
+  # Güvenlik açığı taraması
+  scan_vulnerabilities: true
+  
+  # Endpoint numaralandırma
+  enumerate_endpoints: true
+  
+  # Kullanıcı numaralandırma
+  enumerate_users: true
+  
+  # Tema numaralandırma
+  enumerate_themes: true
+  
+  # Eklenti numaralandırma
+  enumerate_plugins: true
+  
+  # Enable security header analysis
+  analyze_security: true
+  
+  # Enable fingerprinting
+  fingerprint: true
+  
+  # Maximum scan depth
+  max_depth: 3
+  
+  # Follow redirects
+  follow_redirects: true
+  
+  # Maximum number of redirects to follow
+  max_redirects: 5
+
+# Vulnerability Scanning
+vulnerabilities:
+  # Enable CVE scanning
+  enable_cve_scan: true
+  
+  # CVE database file path
+  cve_database: "./data/cve_database.json"
+  
+  # Enable exploit testing
+  test_exploits: false
+  
+  # Exploit timeout (in seconds)
+  exploit_timeout: 10
+  
+  # CVEs to specifically check for
+  target_cves:
+    - "CVE-2023-49008"  # Path Traversal
+    - "CVE-2023-49009"  # Template Injection
+    - "CVE-2022-41654"  # Authentication Bypass
+    - "CVE-2021-29484"  # XSS Vulnerability
+    - "CVE-2020-15726"  # SSRF Vulnerability
+  
+  # Severity levels to report
+  severity_levels:
+    - "critical"
+    - "high"
+    - "medium"
+    - "low"
+
+# Enumeration Settings
+enumeration:
+  # User enumeration settings
+  users:
+    # Enable user enumeration
+    enabled: true
+    
+    # Maximum number of users to enumerate
+    max_users: 100
+    
+    # User enumeration methods
+    methods:
+      - "api"        # Ghost API
+      - "sitemap"    # Sitemap.xml
+      - "rss"        # RSS feeds
+      - "posts"      # Post authors
+    
+    # Common usernames to check
+    common_usernames:
+      - "admin"
+      - "administrator"
+      - "ghost"
+      - "user"
+      - "test"
+      - "demo"
+  
+  # Theme enumeration settings
+  themes:
+    # Enable theme enumeration
+    enabled: true
+    
+    # Maximum number of themes to check
+    max_themes: 50
+    
+    # Theme enumeration methods
+    methods:
+      - "api"        # Ghost API
+      - "directory"  # Directory listing
+      - "common"     # Common theme names
+    
+    # Common theme names to check
+    common_themes:
+      - "casper"
+      - "dawn"
+      - "edition"
+      - "london"
+      - "massively"
+      - "editorial"
+      - "liebling"
+      - "alto"
+      - "wave"
+      - "journal"
+  
+  # Endpoint enumeration settings
+  endpoints:
+    # Enable endpoint enumeration
+    enabled: true
+    
+    # Maximum number of endpoints to check
+    max_endpoints: 200
+    
+    # Endpoint wordlist file
+    wordlist: "./wordlists/endpoints.txt"
+    
+    # Common endpoints to check
+    common_endpoints:
+      - "/ghost/"
+      - "/admin/"
+      - "/api/"
+      - "/content/"
+      - "/members/"
+      - "/signup/"
+      - "/signin/"
+      - "/rss/"
+      - "/sitemap.xml"
+      - "/robots.txt"
+
+# Brute Force Settings
+bruteforce:
+  # Enable brute force attacks
+  enabled: false
+  
+  # Target endpoints for brute force
+  targets:
+    - "/ghost/signin/"
+    - "/ghost/api/admin/session/"
+  
+  # Username wordlist
+  username_wordlist: "./wordlists/usernames.txt"
+  
+  # Password wordlist
+  password_wordlist: "./wordlists/passwords.txt"
+  
+  # Maximum number of attempts
+  max_attempts: 100
+  
+  # Delay between attempts (in milliseconds)
+  delay: 1000
+  
+  # Enable account lockout detection
+  detect_lockout: true
+  
+  # Stop on first success
+  stop_on_success: true
+  
+  # Common credentials to try
+  common_credentials:
+    - username: "admin"
+      password: "admin"
+    - username: "admin"
+      password: "password"
+    - username: "ghost"
+      password: "ghost"
+    - username: "admin"
+      password: "123456"
+
+# Stealth Settings
+stealth:
+  # Enable stealth mode
+  enabled: false
+  
+  # Random delay between requests (min-max in milliseconds)
+  random_delay:
+    min: 500
+    max: 2000
+  
+  # Rotate user agents
+  rotate_user_agents: true
+  
+  # User agent list
+  user_agents:
+    - "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    - "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+    - "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"
+    - "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101"
+  
+  # Use proxy
+  use_proxy: false
+  
+  # Proxy settings
+  proxy:
+    http: ""
+    https: ""
+    socks5: ""
+  
+  # Rate limiting
+  rate_limit:
+    # Requests per second
+    rps: 5
+    
+    # Burst size
+    burst: 10
+
+# Output Settings
+output:
+  # Save results to file
+  save_to_file: true
+  
+  # Include timestamps in filenames
+  timestamp_filenames: true
+  
+  # Compress output files
+  compress: false
+  
+  # Pretty print JSON output
+  pretty_json: true
+  
+  # Include raw HTTP responses
+  include_raw_responses: false
+  
+  # Maximum file size (in MB)
+  max_file_size: 100
+  
+  # Report template settings
+  templates:
+    html:
+      title: "GhostScan Security Report"
+      include_toc: true
+      theme: "default"
+    
+    markdown:
+      include_toc: true
+      include_metadata: true
+
+# Database Settings
+database:
+  # Enable database storage
+  enabled: true
+  
+  # Database file path
+  path: "./data/ghostscan.db"
+  
+  # Auto-cleanup old records (in days)
+  cleanup_after_days: 30
+  
+  # Enable database compression
+  compress: true
+  
+  # Backup settings
+  backup:
+    enabled: true
+    interval: "24h"
+    keep_backups: 7
+    backup_dir: "./data/backups"
+
+# Logging Settings
+logging:
+  # Log level (debug, info, warn, error)
+  level: "info"
+  
+  # Log file path
+  file: "./logs/ghostscan.log"
+  
+  # Maximum log file size (in MB)
+  max_size: 10
+  
+  # Maximum number of log files to keep
+  max_files: 5
+  
+  # Log format (json, text)
+  format: "text"
+  
+  # Enable console output
+  console: true
+  
+  # Enable file output
+  file_output: true
+
+# API Settings
+api:
+  # Ghost API settings
+  ghost:
+    # API version to use
+    version: "v4"
+    
+    # Content API key (if available)
+    content_key: ""
+    
+    # Admin API key (if available)
+    admin_key: ""
+    
+    # API timeout (in seconds)
+    timeout: 15
+    
+    # Maximum retries
+    max_retries: 3
+
+# Security Settings
+security:
+  # SSL/TLS settings
+  tls:
+    # Verify SSL certificates
+    verify_certificates: true
+    
+    # Minimum TLS version
+    min_version: "1.2"
+    
+    # Enable certificate analysis
+    analyze_certificates: true
+  
+  # HTTP settings
+  http:
+    # Follow redirects
+    follow_redirects: true
+    
+    # Maximum redirects
+    max_redirects: 5
+    
+    # Enable cookie jar
+    enable_cookies: true
+    
+    # Custom headers
+    headers: {}
+
+# Wordlists
+wordlists:
+  # Base directory for wordlists
+  base_dir: "./wordlists"
+  
+  # Wordlist files
+  files:
+    usernames: "usernames.txt"
+    passwords: "passwords.txt"
+    endpoints: "endpoints.txt"
+    themes: "themes.txt"
+    plugins: "plugins.txt"
+    files: "files.txt"
+    directories: "directories.txt"
+
+# Update Settings
+updates:
+  # Enable automatic updates
+  auto_update: false
+  
+  # Update check interval (in hours)
+  check_interval: 24
+  
+  # Update server URL
+  server_url: "https://api.github.com/repos/ghostscan/ghostscan"
+  
+  # Include pre-release versions
+  include_prerelease: false
+
+# Notification Settings
+notifications:
+  # Enable notifications
+  enabled: false
+  
+  # Notification methods
+  methods:
+    # Email notifications
+    email:
+      enabled: false
+      smtp_server: ""
+      smtp_port: 587
+      username: ""
+      password: ""
+      from: ""
+      to: []
+    
+    # Slack notifications
+    slack:
+      enabled: false
+      webhook_url: ""
+      channel: "#security"
+    
+    # Discord notifications
+    discord:
+      enabled: false
+      webhook_url: ""
+  
+  # Notification triggers
+  triggers:
+    - "vulnerabilities_found"
+    - "scan_completed"
+    - "scan_failed"
+    - "high_severity_found"
+
+# Performance Settings
+performance:
+  # Memory settings
+  memory:
+    # Maximum memory usage (in MB)
+    max_usage: 512
+    
+    # Enable memory profiling
+    profiling: false
+  
+  # CPU settings
+  cpu:
+    # Maximum CPU cores to use
+    max_cores: 0  # 0 = use all available
+    
+    # Enable CPU profiling
+    profiling: false
+  
+  # Cache settings
+  cache:
+    # Enable response caching
+    enabled: true
+    
+    # Cache size (in MB)
+    size: 50
+    
+    # Cache TTL (in minutes)
+    ttl: 60
+
+# Plugin Settings
+plugins:
+  # Enable plugin system
+  enabled: false
+  
+  # Plugin directory
+  directory: "./plugins"
+  
+  # Auto-load plugins
+  auto_load: true
+  
+  # Enabled plugins
+  enabled_plugins: []
+  
+  # Plugin settings
+  settings: {}

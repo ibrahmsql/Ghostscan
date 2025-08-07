@@ -1,0 +1,175 @@
+# GhostScan Configuration Example
+# This file demonstrates various configuration options for GhostScan
+
+# Target configuration
+target:
+  url: "https://example.com"
+  timeout: 30
+  user_agent: "GhostScan/1.0"
+  threads: 10
+
+# Enumeration settings
+enumeration:
+  enabled: true
+  components:
+    - themes
+    - users
+    - posts
+    - tags
+    - integrations
+  
+  # Theme enumeration settings
+  themes:
+    check_vulnerabilities: true
+    max_themes: 100
+  
+  # User enumeration settings
+  users:
+    max_users: 50
+    check_authors: true
+    check_rss: true
+  
+  # Post enumeration settings
+  posts:
+    max_posts: 20
+    check_drafts: true
+  
+  # Tag enumeration settings
+  tags:
+    max_tags: 50
+  
+  # Integration enumeration settings
+  integrations:
+    check_analytics: true
+    check_payment: true
+    check_webhooks: true
+
+# Brute force settings
+brute_force:
+  enabled: false
+  userlist: "wordlists/usernames.txt"
+  passlist: "wordlists/passwords.txt"
+  max_attempts: 100
+  delay_between_attempts: 1000  # milliseconds
+  stop_on_success: true
+
+# Vulnerability scanning
+vulnerability_scan:
+  enabled: true
+  check_cves:
+    - "CVE-2023-32235"  # Path Traversal in Theme Preview
+    - "CVE-2023-40028"  # Arbitrary File Read via Theme Upload
+    - "CVE-2024-23724"  # Stored XSS via Profile Image
+  
+  # Custom vulnerability checks
+  custom_checks:
+    - name: "Admin Interface Exposure"
+      path: "/ghost/"
+      method: "GET"
+      expected_status: [200, 302]
+    
+    - name: "API Endpoint Exposure"
+      path: "/ghost/api/v4/admin/site/"
+      method: "GET"
+      expected_status: [200, 401]
+    
+    - name: "Content Directory Browsing"
+      path: "/content/"
+      method: "GET"
+      expected_status: [200]
+      check_directory_listing: true
+
+# Misconfiguration checks
+misconfiguration_scan:
+  enabled: true
+  checks:
+    - admin_over_http
+    - debug_mode_enabled
+    - directory_browsing
+    - exposed_config_files
+    - weak_ssl_configuration
+    - missing_security_headers
+
+# Output settings
+output:
+  format: "text"  # text, json, xml
+  file: ""  # empty means stdout
+  colored: true
+  verbose: false
+  
+  # Report sections to include
+  sections:
+    - banner
+    - target_info
+    - vulnerabilities
+    - misconfigurations
+    - enumeration_results
+    - brute_force_results
+    - recommendations
+
+# HTTP settings
+http:
+  follow_redirects: true
+  max_redirects: 5
+  verify_ssl: false
+  proxy: ""  # e.g., "http://127.0.0.1:8080"
+  
+  # Custom headers
+  headers:
+    Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+    Accept-Language: "en-US,en;q=0.5"
+    Accept-Encoding: "gzip, deflate"
+    Connection: "keep-alive"
+
+# Rate limiting
+rate_limiting:
+  requests_per_second: 10
+  burst_size: 20
+  respect_robots_txt: true
+
+# Logging
+logging:
+  level: "info"  # debug, info, warn, error
+  file: "ghostscan.log"
+  max_size: 100  # MB
+  max_backups: 3
+  max_age: 30  # days
+
+# Advanced settings
+advanced:
+  # Skip certain checks
+  skip_checks:
+    - "slow_vulnerability_scan"
+    - "aggressive_enumeration"
+  
+  # Custom payloads for testing
+  custom_payloads:
+    path_traversal:
+      - "../../../etc/passwd"
+      - "..\\..\\..\\windows\\system32\\drivers\\etc\\hosts"
+    
+    xss:
+      - "<script>alert('XSS')</script>"
+      - "javascript:alert('XSS')"
+    
+    sql_injection:
+      - "' OR '1'='1"
+      - "1' UNION SELECT NULL--"
+  
+  # Fingerprinting database
+  fingerprints:
+    update_on_startup: true
+    custom_fingerprints_file: "custom_fingerprints.json"
+
+# Notification settings (for future implementation)
+notifications:
+  enabled: false
+  webhook_url: ""
+  email:
+    enabled: false
+    smtp_server: ""
+    smtp_port: 587
+    username: ""
+    password: ""
+    to: []
+    subject: "GhostScan Results"

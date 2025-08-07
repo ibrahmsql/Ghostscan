@@ -1,0 +1,312 @@
+# Default values for ghostscan.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Global settings
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+  storageClass: ""
+
+# Image settings
+image:
+  registry: docker.io
+  repository: ghostscan/ghostscan
+  tag: "1.0.0"
+  pullPolicy: IfNotPresent
+  pullSecrets: []
+
+# Deployment settings
+replicaCount: 3
+
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 1
+    maxSurge: 1
+
+# Pod settings
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "8080"
+  prometheus.io/path: "/metrics"
+
+podLabels: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1001
+  runAsGroup: 1001
+  fsGroup: 1001
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+    - ALL
+
+# Service settings
+service:
+  type: ClusterIP
+  port: 8080
+  targetPort: 8080
+  annotations: {}
+
+# Ingress settings
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: ghostscan.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: ghostscan-tls
+  #    hosts:
+  #      - ghostscan.local
+
+# Resource settings
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# Autoscaling settings
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+# Node selection
+nodeSelector:
+  kubernetes.io/os: linux
+
+tolerations:
+  - key: "security-tools"
+    operator: "Equal"
+    value: "true"
+    effect: "NoSchedule"
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - ghostscan
+        topologyKey: kubernetes.io/hostname
+
+# Environment variables
+env:
+  GHOSTSCAN_LOG_LEVEL: "info"
+  GHOSTSCAN_THREADS: "5"
+  GHOSTSCAN_TIMEOUT: "30"
+  GHOSTSCAN_OUTPUT_DIR: "/app/output"
+  GHOSTSCAN_CONFIG_DIR: "/app/configs"
+
+# Health checks
+livenessProbe:
+  enabled: true
+  exec:
+    command:
+    - ghostscan
+    - --version
+  initialDelaySeconds: 30
+  periodSeconds: 30
+  timeoutSeconds: 10
+  failureThreshold: 3
+  successThreshold: 1
+
+readinessProbe:
+  enabled: true
+  exec:
+    command:
+    - ghostscan
+    - --version
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+  successThreshold: 1
+
+# Persistence settings
+persistence:
+  output:
+    enabled: true
+    storageClass: ""
+    accessMode: ReadWriteOnce
+    size: 10Gi
+    annotations: {}
+  logs:
+    enabled: true
+    storageClass: ""
+    accessMode: ReadWriteOnce
+    size: 5Gi
+    annotations: {}
+
+# ConfigMap settings
+config:
+  scanner:
+    threads: 5
+    timeout: 30
+    user_agent: "GhostScan/1.0 (Kubernetes)"
+    delay: 1000
+    random_delay: true
+    max_redirects: 5
+    deep_scan: false
+  
+  enumeration:
+    users: true
+    themes: true
+    plugins: true
+    endpoints: true
+    posts: false
+    tags: false
+    pages: false
+  
+  vulnerabilities:
+    enabled: true
+    passive_only: false
+    check_cve: true
+    check_misconfig: true
+  
+  bruteforce:
+    enabled: false
+    users_wordlist: "/app/wordlists/usernames.txt"
+    passwords_wordlist: "/app/wordlists/passwords.txt"
+    max_attempts: 100
+    delay_between_attempts: 2000
+  
+  output:
+    format: "json"
+    file: "/app/output/scan-results.json"
+    verbose: true
+    colored: false
+    save_raw: false
+  
+  logging:
+    level: "info"
+    file: "/app/logs/ghostscan.log"
+    max_size: 100
+    max_backups: 5
+    max_age: 30
+
+# Wordlists
+wordlists:
+  usernames:
+    - admin
+    - administrator
+    - ghost
+    - editor
+    - author
+    - user
+    - test
+    - demo
+    - guest
+    - owner
+    - moderator
+    - contributor
+  
+  passwords:
+    - password
+    - 123456
+    - admin
+    - ghost
+    - password123
+    - qwerty
+    - letmein
+    - welcome
+    - changeme
+    - 12345678
+    - abc123
+    - Password1
+
+# ServiceAccount settings
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# RBAC settings
+rbac:
+  create: true
+  rules:
+    - apiGroups: [""]
+      resources: ["configmaps", "secrets"]
+      verbs: ["get", "list"]
+    - apiGroups: [""]
+      resources: ["pods"]
+      verbs: ["get", "list"]
+
+# Pod Disruption Budget
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+  # maxUnavailable: 1
+
+# Network Policy
+networkPolicy:
+  enabled: true
+  ingress:
+    enabled: true
+    from:
+      - namespaceSelector:
+          matchLabels:
+            name: monitoring
+  egress:
+    enabled: true
+    # Allow all egress for scanning
+    to: []
+
+# Monitoring settings
+monitoring:
+  enabled: false
+  serviceMonitor:
+    enabled: false
+    namespace: ""
+    interval: 30s
+    scrapeTimeout: 10s
+    labels: {}
+    annotations: {}
+  
+  prometheusRule:
+    enabled: false
+    namespace: ""
+    labels: {}
+    annotations: {}
+    rules: []
+
+# Extra objects to deploy
+extraObjects: []
+
+# Extra volumes
+extraVolumes: []
+
+# Extra volume mounts
+extraVolumeMounts: []
+
+# Extra containers
+extraContainers: []
+
+# Extra init containers
+extraInitContainers: []
+
+# Common labels
+commonLabels: {}
+
+# Common annotations
+commonAnnotations: {}

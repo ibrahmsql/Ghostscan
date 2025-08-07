@@ -1,0 +1,56 @@
+# GhostScan Scanner Configuration
+# Main scanner settings
+
+scanner:
+  # Temel ayarlar
+  timeout: 30s
+  max_concurrent_requests: 10
+  user_agent: "GhostScan/1.0 Security Scanner"
+  follow_redirects: true
+  max_redirects: 3
+  
+  # SSL/TLS settings
+  ssl:
+    verify_certificates: false
+    min_tls_version: "1.2"
+    
+  # Proxy settings
+  proxy:
+    enabled: false
+    url: ""
+    auth:
+      username: ""
+      password: ""
+      
+  # Rate limiting
+  rate_limit:
+    requests_per_second: 5
+    burst_size: 10
+    delay_between_requests: 200ms
+    
+  # Retry settings
+  retry:
+    max_attempts: 3
+    backoff_factor: 2
+    initial_delay: 1s
+    
+  # Headers
+  headers:
+    accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+    accept_language: "en-US,en;q=0.5"
+    accept_encoding: "gzip, deflate"
+    connection: "keep-alive"
+    
+  # Detection settings
+  detection:
+    mode: "aggressive"  # passive, aggressive, mixed
+    confidence_threshold: 70
+    check_version: true
+    check_themes: true
+    check_plugins: true
+    
+  # Security settings
+  security:
+    check_vulnerabilities: true
+    exploit_verification: false
+    safe_mode: true

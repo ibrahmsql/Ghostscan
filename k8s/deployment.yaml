@@ -1,0 +1,327 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ghostscan
+  namespace: security-tools
+  labels:
+    app: ghostscan
+    version: v1.0.0
+    component: scanner
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: ghostscan
+  template:
+    metadata:
+      labels:
+        app: ghostscan
+        version: v1.0.0
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: ghostscan
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+      containers:
+      - name: ghostscan
+        image: ghostscan:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        env:
+        - name: GHOSTSCAN_LOG_LEVEL
+          value: "info"
+        - name: GHOSTSCAN_THREADS
+          value: "5"
+        - name: GHOSTSCAN_TIMEOUT
+          value: "30"
+        - name: GHOSTSCAN_OUTPUT_DIR
+          value: "/app/output"
+        - name: GHOSTSCAN_CONFIG_DIR
+          value: "/app/configs"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app/configs
+          readOnly: true
+        - name: wordlists-volume
+          mountPath: /app/wordlists
+          readOnly: true
+        - name: output-volume
+          mountPath: /app/output
+        - name: logs-volume
+          mountPath: /app/logs
+        livenessProbe:
+          exec:
+            command:
+            - ghostscan
+            - --version
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          exec:
+            command:
+            - ghostscan
+            - --version
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+      volumes:
+      - name: config-volume
+        configMap:
+          name: ghostscan-config
+      - name: wordlists-volume
+        configMap:
+          name: ghostscan-wordlists
+      - name: output-volume
+        persistentVolumeClaim:
+          claimName: ghostscan-output-pvc
+      - name: logs-volume
+        persistentVolumeClaim:
+          claimName: ghostscan-logs-pvc
+      nodeSelector:
+        kubernetes.io/os: linux
+      tolerations:
+      - key: "security-tools"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - ghostscan
+              topologyKey: kubernetes.io/hostname
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ghostscan-service
+  namespace: security-tools
+  labels:
+    app: ghostscan
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  selector:
+    app: ghostscan
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ghostscan
+  namespace: security-tools
+  labels:
+    app: ghostscan
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: security-tools
+  name: ghostscan-role
+rules:
+- apiGroups: [""]
+  resources: ["configmaps", "secrets"]
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ghostscan-rolebinding
+  namespace: security-tools
+subjects:
+- kind: ServiceAccount
+  name: ghostscan
+  namespace: security-tools
+roleRef:
+  kind: Role
+  name: ghostscan-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ghostscan-output-pvc
+  namespace: security-tools
+  labels:
+    app: ghostscan
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: fast-ssd
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ghostscan-logs-pvc
+  namespace: security-tools
+  labels:
+    app: ghostscan
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: fast-ssd
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ghostscan-config
+  namespace: security-tools
+  labels:
+    app: ghostscan
+data:
+  config.yaml: |
+    scanner:
+      threads: 5
+      timeout: 30
+      user_agent: "GhostScan/1.0 (Kubernetes)"
+      delay: 1000
+      random_delay: true
+      max_redirects: 5
+      deep_scan: false
+    
+    enumeration:
+      users: true
+      themes: true
+      plugins: true
+      endpoints: true
+      posts: false
+      tags: false
+      pages: false
+    
+    vulnerabilities:
+      enabled: true
+      passive_only: false
+      check_cve: true
+      check_misconfig: true
+    
+    bruteforce:
+      enabled: false
+      users_wordlist: "/app/wordlists/usernames.txt"
+      passwords_wordlist: "/app/wordlists/passwords.txt"
+      max_attempts: 100
+      delay_between_attempts: 2000
+    
+    output:
+      format: "json"
+      file: "/app/output/scan-results.json"
+      verbose: true
+      colored: false
+      save_raw: false
+    
+    logging:
+      level: "info"
+      file: "/app/logs/ghostscan.log"
+      max_size: 100
+      max_backups: 5
+      max_age: 30
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ghostscan-wordlists
+  namespace: security-tools
+  labels:
+    app: ghostscan
+binaryData:
+  usernames.txt: |
+    admin
+    administrator
+    ghost
+    editor
+    author
+    user
+    test
+    demo
+    guest
+  passwords.txt: |
+    password
+    123456
+    admin
+    ghost
+    password123
+    qwerty
+    letmein
+    welcome
+    changeme
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: ghostscan-pdb
+  namespace: security-tools
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: ghostscan
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ghostscan-netpol
+  namespace: security-tools
+spec:
+  podSelector:
+    matchLabels:
+      app: ghostscan
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+    ports:
+    - protocol: TCP
+      port: 8080
+  egress:
+  - {} # Allow all egress traffic for scanning

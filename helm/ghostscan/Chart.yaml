@@ -1,0 +1,64 @@
+apiVersion: v2
+name: ghostscan
+description: A Helm chart for GhostScan - Ghost CMS Security Scanner
+
+# Chart type: application or library
+type: application
+
+# Chart version (SemVer)
+version: 1.0.0
+
+# Application version
+appVersion: "1.0.0"
+
+# Keywords for easier discovery
+keywords:
+  - security
+  - scanner
+  - ghost
+  - cms
+  - vulnerability
+  - penetration-testing
+
+# Home page URL
+home: https://github.com/ibrahmsql/ghostscan
+
+# Source code URLs
+sources:
+  - https://github.com/ibrahmsql/ghostscan
+
+# Maintainers
+maintainers:
+  - name: GhostScan Team
+    email: team@ghostscan.io
+    url: https://github.com/ibrahmsql/ghostscan
+
+# Icon URL
+icon: https://raw.githubusercontent.com/ibrahmsql/ghostscan/main/assets/logo.png
+
+# Annotations
+annotations:
+  category: Security
+  licenses: BSD-2-Clause
+  images: |
+    - name: ghostscan
+      image: ghostscan:1.0.0
+  artifacthub.io/changes: |
+    - kind: added
+      description: Initial release of GhostScan Helm chart
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/recommendations: |
+    - url: https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack
+    - url: https://artifacthub.io/packages/helm/grafana/grafana
+  artifacthub.io/links: |
+    - name: Documentation
+      url: https://github.com/ibrahmsql/ghostscan/blob/main/README.md
+    - name: Support
+      url: https://github.com/ibrahmsql/ghostscan/issues
+
+# Dependencies
+dependencies: []
+
+# Minimum Kubernetes version
+kubeVersion: ">=1.20.0-0"

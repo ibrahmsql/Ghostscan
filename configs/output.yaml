@@ -1,0 +1,200 @@
+# GhostScan Output Configuration
+# Output and reporting settings
+
+output:
+  # Genel ayarlar
+  enabled: true
+  verbose: false
+  quiet: false
+  no_color: false
+  
+  # Output formats
+  formats:
+    # Console output
+    console:
+      enabled: true
+      show_banner: true
+      show_progress: true
+      show_timestamps: true
+      color_scheme: "default"  # default, dark, light, minimal
+      
+    # JSON output
+    json:
+      enabled: true
+      pretty_print: true
+      include_metadata: true
+      file_extension: ".json"
+      
+    # XML output
+    xml:
+      enabled: false
+      pretty_print: true
+      include_metadata: true
+      file_extension: ".xml"
+      
+    # HTML raporu
+    html:
+      enabled: true
+      template: "default"
+      include_css: true
+      include_javascript: true
+      file_extension: ".html"
+      
+    # CSV output
+    csv:
+      enabled: false
+      delimiter: ","
+      include_headers: true
+      file_extension: ".csv"
+      
+    # Markdown raporu
+    markdown:
+      enabled: false
+      include_toc: true
+      file_extension: ".md"
+      
+  # File settings
+  files:
+    # Output directory
+    output_directory: "./reports"
+    
+    # File naming
+    naming:
+      pattern: "ghostscan_{target}_{timestamp}"
+      timestamp_format: "2006-01-02_15-04-05"
+      sanitize_target: true
+      
+    # File management
+    management:
+      auto_create_directory: true
+      overwrite_existing: false
+      backup_existing: true
+      max_file_size: "100MB"
+      
+  # Report content
+  content:
+    # Sections to include
+    sections:
+      - "summary"           # Summary information
+      - "target_info"       # Target information
+      - "scan_results"      # Scan results
+      - "vulnerabilities"   # Security vulnerabilities
+      - "enumeration"       # Enumeration results
+      - "bruteforce"        # Brute force results
+      - "recommendations"   # Recommendations
+      - "technical_details" # Technical details
+      
+    # Detay seviyesi
+    detail_level: "medium"  # minimal, medium, detailed, verbose
+    
+    # Filtreleme
+    filters:
+      min_severity: "low"
+      include_info: true
+      include_false_positives: false
+      
+  # Visualization
+  visualization:
+    # Grafikler
+    charts:
+      enabled: true
+      types:
+        - "severity_distribution"  # Vulnerability distribution
+        - "scan_timeline"         # Scan timeline
+        - "vulnerability_trends"  # Vulnerability trends
+        
+    # Tablolar
+    tables:
+      enabled: true
+      sortable: true
+      filterable: true
+      pagination: true
+      
+  # Bildirimler
+  notifications:
+    # Email bildirimleri
+    email:
+      enabled: false
+      smtp_server: ""
+      smtp_port: 587
+      username: ""
+      password: ""
+      from_address: ""
+      to_addresses: []
+      subject_template: "GhostScan Report - {target}"
+      
+    # Webhook bildirimleri
+    webhook:
+      enabled: false
+      url: ""
+      method: "POST"
+      headers: {}
+      timeout: 10s
+      
+    # Slack bildirimleri
+    slack:
+      enabled: false
+      webhook_url: ""
+      channel: "#security"
+      username: "GhostScan"
+      
+  # Templates
+  templates:
+    # HTML template
+    html:
+      header: |
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>GhostScan Report - {{.Target}}</title>
+            <meta charset="utf-8">
+            <style>
+                body { font-family: Arial, sans-serif; margin: 40px; }
+                .header { background: #2c3e50; color: white; padding: 20px; }
+                .summary { background: #ecf0f1; padding: 15px; margin: 20px 0; }
+                .vulnerability { border-left: 4px solid #e74c3c; padding: 10px; margin: 10px 0; }
+                .high { border-color: #e74c3c; }
+                .medium { border-color: #f39c12; }
+                .low { border-color: #f1c40f; }
+                .info { border-color: #3498db; }
+            </style>
+        </head>
+        <body>
+      
+      footer: |
+        </body>
+        </html>
+        
+    # JSON template
+    json:
+      structure:
+        target: "{{.Target}}"
+        scan_time: "{{.ScanTime}}"
+        duration: "{{.Duration}}"
+        summary: "{{.Summary}}"
+        results: "{{.Results}}"
+        
+  # Archiving
+  archiving:
+    enabled: false
+    format: "zip"  # zip, tar, tar.gz
+    include_logs: true
+    retention_days: 30
+    
+  # Performans
+  performance:
+    buffer_size: 8192
+    flush_interval: "5s"
+    compression: false
+    
+  # Security
+  security:
+    sanitize_output: true
+    redact_sensitive: true
+    encrypt_files: false
+    
+  # Debugging
+  debug:
+    enabled: false
+    log_level: "info"
+    include_request_response: false

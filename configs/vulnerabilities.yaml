@@ -1,0 +1,124 @@
+# GhostScan Vulnerability Configuration
+# Vulnerability scanning settings
+
+vulnerabilities:
+  # Database settings
+  database:
+    auto_update: true
+    update_interval: "24h"
+    cache_dir: "~/.ghostscan/db"
+    sources:
+      - "https://api.ghostscan.io/v1/vulnerabilities"
+      - "https://nvd.nist.gov/feeds/json/cve/1.1/"
+      - "https://github.com/ghostscan/vulnerability-database"
+    
+    # API settings
+    api:
+      timeout: 30s
+      retry_attempts: 3
+      rate_limit: 10
+      
+  # Scanning settings
+  scanning:
+    enabled: true
+    check_all_versions: true
+    include_low_severity: false
+    minimum_cvss_score: 4.0
+    
+    # Tarama kategorileri
+    categories:
+      - "core"          # Ghost core security vulnerabilities
+      - "themes"        # Theme security vulnerabilities
+      - "integrations"  # Integration security vulnerabilities
+      - "configuration" # Configuration issues
+      
+  # Exploit settings
+  exploits:
+    enabled: false
+    safe_mode: true
+    verify_only: true
+    timeout: 10s
+    
+    # Exploit categories
+    categories:
+      - "path_traversal"
+      - "sql_injection"
+      - "xss"
+      - "csrf"
+      - "file_upload"
+      - "authentication_bypass"
+      
+  # Reporting settings
+  reporting:
+    include_details: true
+    include_references: true
+    include_remediation: true
+    severity_levels:
+      - "critical"
+      - "high"
+      - "medium"
+      - "low"
+      - "info"
+      
+  # Known security vulnerabilities
+  known_vulnerabilities:
+    # Ghost Core
+    core:
+      - cve: "CVE-2023-32235"
+        title: "Path Traversal in Theme Preview"
+        severity: "high"
+        cvss: 7.5
+        affected_versions: "<= 5.52.1"
+        fixed_version: ">= 5.52.2"
+        
+      - cve: "CVE-2023-40028"
+        title: "Arbitrary File Read via Theme Upload"
+        severity: "critical"
+        cvss: 9.1
+        affected_versions: "<= 5.59.0"
+        fixed_version: ">= 5.59.1"
+        
+    # Theme security vulnerabilities
+    themes:
+      - name: "casper"
+        vulnerabilities:
+          - type: "xss"
+            severity: "medium"
+            description: "Stored XSS in comment section"
+            
+  # Security checks
+  security_checks:
+    # Configuration checks
+    configuration:
+      - "debug_mode_enabled"
+      - "default_credentials"
+      - "weak_session_config"
+      - "insecure_headers"
+      - "directory_listing"
+      
+    # File checks
+    files:
+      - "sensitive_files_exposed"
+      - "backup_files_accessible"
+      - "log_files_readable"
+      - "config_files_exposed"
+      
+    # Network checks
+    network:
+      - "ssl_configuration"
+      - "http_methods_allowed"
+      - "cors_misconfiguration"
+      - "security_headers_missing"
+      
+  # Filtering settings
+  filters:
+    exclude_cves: []
+    exclude_severities: []
+    include_only_exploitable: false
+    
+  # Performance settings
+  performance:
+    max_concurrent_checks: 5
+    check_timeout: 15s
+    cache_results: true
+    cache_ttl: "1h"

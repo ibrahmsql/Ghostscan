@@ -1,0 +1,187 @@
+# GhostScan Brute Force Configuration
+# Brute force attack settings
+
+bruteforce:
+  # General settings
+  enabled: false
+  safe_mode: true
+  max_attempts: 1000
+  timeout: 30s
+  
+  # Rate limiting
+  rate_limit:
+    requests_per_second: 2
+    delay_between_attempts: 500ms
+    random_delay: true
+    max_random_delay: 1000ms
+    
+  # Target settings
+  targets:
+    # Admin panel
+    admin:
+      enabled: true
+      endpoint: "/ghost/signin/"
+      method: "POST"
+      success_indicators:
+        - "dashboard"
+        - "admin"
+        - "redirect"
+      failure_indicators:
+        - "invalid"
+        - "incorrect"
+        - "failed"
+        - "error"
+        
+    # API endpoints
+    api:
+      enabled: true
+      endpoint: "/ghost/api/v4/admin/session/"
+      method: "POST"
+      
+  # Username lists
+  usernames:
+    # Default usernames
+    default:
+      - "admin"
+      - "administrator"
+      - "ghost"
+      - "user"
+      - "test"
+      - "demo"
+      - "editor"
+      - "author"
+      - "writer"
+      - "blogger"
+      
+    # Dosyadan okuma
+    wordlist:
+      enabled: true
+      file: "wordlists/usernames.txt"
+      
+    # Use enumeration results
+    from_enumeration: true
+    
+  # Password lists
+  passwords:
+    # Default passwords
+    default:
+      - "admin"
+      - "password"
+      - "123456"
+      - "ghost"
+      - "admin123"
+      - "password123"
+      - "qwerty"
+      - "letmein"
+      - "welcome"
+      - "changeme"
+      
+    # Common Ghost passwords
+    ghost_specific:
+      - "ghost123"
+      - "ghostadmin"
+      - "ghostpass"
+      - "ghost2023"
+      - "ghost2024"
+      
+    # Dosyadan okuma
+    wordlist:
+      enabled: true
+      file: "wordlists/passwords.txt"
+      
+    # Password generation rules
+    generation:
+      enabled: false
+      rules:
+        - "append_numbers"    # Append numbers at the end
+        - "append_years"      # Append years at the end
+        - "capitalize_first"  # Capitalize first letter
+        - "all_uppercase"     # Convert all to uppercase
+        - "all_lowercase"     # Convert all to lowercase
+        
+  # Attack strategies
+  strategies:
+    # Credential stuffing
+    credential_stuffing:
+      enabled: false
+      combo_file: "wordlists/combos.txt"
+      
+    # Dictionary attack
+    dictionary:
+      enabled: true
+      username_first: true
+      
+    # Hybrid attack
+    hybrid:
+      enabled: false
+      base_words: ["ghost", "admin", "blog"]
+      mutations:
+        - "123"
+        - "2023"
+        - "2024"
+        - "!"
+        - "@"
+        
+  # Detection and prevention
+  detection:
+    # CAPTCHA tespiti
+    captcha:
+      enabled: true
+      stop_on_captcha: true
+      
+    # Rate limiting tespiti
+    rate_limiting:
+      enabled: true
+      stop_on_rate_limit: true
+      backoff_factor: 2
+      
+    # Account lockout tespiti
+    lockout:
+      enabled: true
+      stop_on_lockout: true
+      
+    # WAF tespiti
+    waf:
+      enabled: true
+      stop_on_waf: true
+      
+  # Proxy ve gizlilik
+  stealth:
+    # Proxy rotation
+    proxy_rotation:
+      enabled: false
+      proxies: []
+      
+    # User agent rotation
+    user_agent_rotation:
+      enabled: true
+      agents:
+        - "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        - "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+        - "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"
+        
+    # Session management
+    sessions:
+      enabled: true
+      max_requests_per_session: 50
+      session_timeout: "5m"
+      
+  # Result settings
+  results:
+    save_successful: true
+    save_failed: false
+    output_format: "json"
+    include_response_time: true
+    
+  # Security settings
+  security:
+    respect_robots_txt: true
+    check_permissions: true
+    log_attempts: true
+    
+  # Performance settings
+  performance:
+    max_concurrent_requests: 3
+    connection_timeout: 10s
+    read_timeout: 15s
+    max_retries: 2
