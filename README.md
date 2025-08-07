@@ -24,14 +24,11 @@
 <img src="https://img.shields.io/badge/YAML-CB171E.svg?style=flat-square&logo=YAML&logoColor=white" alt="YAML">
 <img src="https://img.shields.io/badge/JSON-000000.svg?style=flat-square&logo=JSON&logoColor=white" alt="JSON">
 <img src="https://img.shields.io/badge/Prometheus-E6522C.svg?style=flat-square&logo=Prometheus&logoColor=white" alt="Prometheus">
-<img src="https://img.shields.io/badge/Kubernetes-326CE5.svg?style=flat-square&logo=Kubernetes&logoColor=white" alt="Kubernetes">
-<img src="https://img.shields.io/badge/Helm-0F1689.svg?style=flat-square&logo=Helm&logoColor=white" alt="Helm">
 <br>
 <img src="https://img.shields.io/badge/Cobra-000000.svg?style=flat-square&logo=Go&logoColor=white" alt="Cobra CLI">
 <img src="https://img.shields.io/badge/Viper-000000.svg?style=flat-square&logo=Go&logoColor=white" alt="Viper Config">
 <img src="https://img.shields.io/badge/Resty-00ADD8.svg?style=flat-square&logo=Go&logoColor=white" alt="Resty HTTP">
 <img src="https://img.shields.io/badge/Logrus-000000.svg?style=flat-square&logo=Go&logoColor=white" alt="Logrus">
-<img src="https://img.shields.io/badge/GNU%20Bash-4EAA25.svg?style=flat-square&logo=GNU-Bash&logoColor=white" alt="GNU Bash">
 <img src="https://img.shields.io/badge/Alpine%20Linux-0D597F.svg?style=flat-square&logo=Alpine-Linux&logoColor=white" alt="Alpine Linux">
 <img src="https://img.shields.io/badge/BSD--2--Clause-AB2B28.svg?style=flat-square&logo=BSD&logoColor=white" alt="BSD-2-Clause License">
 
